@@ -1,3 +1,7 @@
 from django.contrib import admin
+from apps.apartment.apartment_models import *
 
-# Register your models here.
+admin.site.register(Housing)
+admin.site.register(Address)
+
+
