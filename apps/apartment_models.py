@@ -40,9 +40,9 @@ class Address(models.Model):
 
 class Housing(models.Model):
     TYPE_CHOICES = (
-        ('A', 'Apartment'),
-        ('H', 'House'),
-        ('S', 'Studio'),
+        ('APARTMENT', 'Apartment'),
+        ('HOUSE', 'House'),
+        ('STUDIO', 'Studio'),
         # другие типы жилья
     )
     objects_name = models.CharField(
@@ -53,7 +53,7 @@ class Housing(models.Model):
         _('Type'),
         max_length=20,
         choices=TYPE_CHOICES,
-        default='A',
+        default='APARTMENT',
     )
     rooms = models.IntegerField(_('Rooms'), )
     description = models.TextField(_('Description'), )
