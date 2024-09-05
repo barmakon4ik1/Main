@@ -27,8 +27,8 @@ class Address(models.Model):
     country = models.CharField(_('Country'), max_length=100)
     city = models.CharField(_('City'), max_length=100)
     street = models.CharField(_('Street'), max_length=100)
-    house_number = models.CharField(_('Haus'), max_length=6)
-    postal_code = models.CharField(_('Post'), max_length=100)
+    house_number = models.CharField(_('Haus number'), max_length=6)
+    postal_code = models.CharField(_('Index'), max_length=100)
 
     def __str__(self):
         return f'{self.street}, {self.house_number}, {self.postal_code} {self.city}, {self.country}'
@@ -46,16 +46,16 @@ class Housing(models.Model):
         # другие типы жилья
     )
     objects_name = models.CharField(
-        _('Name'),
+        _('Name of object'),
         max_length=100
     )
     type = models.CharField(
-        _('Type'),
+        _('Type of object'),
         max_length=20,
         choices=TYPE_CHOICES,
         default='APARTMENT',
     )
-    rooms = models.IntegerField(_('Rooms'), )
+    rooms = models.IntegerField(_('Number of rooms'), )
     description = models.TextField(_('Description'), )
     price = models.DecimalField(
         _('Price'),

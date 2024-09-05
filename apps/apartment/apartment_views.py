@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from apps.apartment_serializers import *
-from apps.apartment_models import *
+from apps.apartment.apartment_serializers import *
+from apps.apartment.apartment_models import *
 
 
 class ApartmentViewSet(viewsets.ModelViewSet):
