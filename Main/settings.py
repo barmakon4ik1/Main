@@ -43,7 +43,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), # срок жизни (5 мин)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5), # срок жизни (5 мин)
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1), # срок жизни рефреша (1 день)
     'ROTATE_REFRESH_TOKENS': True, # будет ли создаваться рефреш при обновлении рефреша?
     'BLACKLIST_AFTER_ROTATION': True, # старый рефреш в черный список?

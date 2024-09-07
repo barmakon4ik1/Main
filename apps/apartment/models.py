@@ -72,7 +72,7 @@ class Housing(models.Model):
     )
     address = models.ForeignKey(
         Address,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         related_name='housing',
     )
@@ -81,6 +81,7 @@ class Housing(models.Model):
         on_delete=models.CASCADE,
         related_name='housings'
     )  # Связь с пользователем
+    is_visible = models.BooleanField(default=True,)
 
     def __str__(self):
         return self.objects_name

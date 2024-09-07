@@ -1,18 +1,26 @@
 from datetime import datetime
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 from django.shortcuts import redirect
 
 
-class IsOwnerOrReadOnly(BasePermission):
+class IsOwnerOrVisibleOrAdmin(BasePermission):
     """
-    Разрешает редактирование объектов только их владельцам, остальным -
-    только чтение.
+    Разрешает доступ:
+    - К видимым объектам (is_visible=True) для всех пользователей.
+    - К редактированию или удалению объектов только для владельца.
+    - Полный доступ для администратора ко всем объектам.
     """
+
     def has_object_permission(self, request, view, obj):
-        # Все пользователи могут просматривать
-        if request.method in ['GET', 'HEAD', 'OPTIONS']:
+        # Если пользователь администратор, то предоставить полный доступ
+        if request.user.is_staff:
             return True
-        # Только владелец может изменять объект
+
+        # Разрешить безопасные методы (GET, HEAD или OPTIONS) всем, если объект видим
+        if request.method in SAFE_METHODS:
+            return obj.is_visible or obj.owner == request.user
+
+        # Разрешить редактирование и удаление только владельцу
         return obj.owner == request.user
 
 

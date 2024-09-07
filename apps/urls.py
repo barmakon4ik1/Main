@@ -7,12 +7,11 @@ from apps.users.views import *
 
 
 router = DefaultRouter()
-router.register(r'apartments', ApartmentViewSet)
-router.register(r'users', UserViewSet)
+router.register(r'apartments', ApartmentViewSet, basename='apartments')
+router.register(r'users', UserViewSet, basename='users')
 
 
 urlpatterns = [
-
 
     # Simple JWT:
     path('api/login/', LoginView.as_view(), name='login'),
@@ -25,5 +24,4 @@ urlpatterns = [
 
 
     path('', include(router.urls)),
-
 ]
