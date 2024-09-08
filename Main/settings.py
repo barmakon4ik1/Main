@@ -29,19 +29,27 @@ ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'users.User'
 
+# Глобальные настройки Rest-фреймворка:
 REST_FRAMEWORK = {
+    # Глобальная настройка пагинации
+    'DEFAULT_PAGINATION_CLASS':
+        'rest_framework.pagination.PageNumberPagination',
+        # Размер страницы по умолчанию:
+        'PAGE_SIZE': 1,
 
-    # Simple JWT
+    # Simple JWT - тип аутентификации
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         ],
 
+    # Разрешения доступа по умолчанию
     'DEFAULT_PERMISSION_CLASSES': [
+        # по умолчанию разрешен просмотр для всех:
         'rest_framework.permissions.AllowAny',
     ]
-
 }
 
+# Настройка Simple JWT аутентификации:
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5), # срок жизни (5 мин)
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1), # срок жизни рефреша (1 день)
