@@ -82,6 +82,7 @@ class Housing(models.Model):
         related_name='housings'
     )  # Связь с пользователем
     is_visible = models.BooleanField(default=True,)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.objects_name

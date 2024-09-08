@@ -1,20 +1,18 @@
 """
 Сериализаторы для моделей объекта и адреса
 """
-
-
 from apps.apartment.models import *
 from rest_framework import serializers
 
 
 class AddressSerializer(serializers.ModelSerializer):
     """
-    сериализатор адреса
+    Сериализатор адреса
     """
 
     class Meta:
         model = Address
-        fields = ['country', 'postal_code', 'city', 'street', 'house_number']
+        fields = ['id', 'country', 'postal_code', 'city', 'street', 'house_number']
 
 
 class HousingSerializer(serializers.ModelSerializer):
@@ -67,13 +65,3 @@ class HousingSerializer(serializers.ModelSerializer):
 
         return instance
 
-
-# class HousingCreateUpdateSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Housing
-#         fields = '__all__'
-#
-#     # Добавляет текущую дату в поле created_at перед созданием объекта:
-#     def create(self, validated_data):
-#         validated_data['created_at'] = timezone.now()
-#         return super().create(validated_data)
