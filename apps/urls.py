@@ -27,7 +27,6 @@ router = DefaultRouter()
 router.register(r'apartments', ApartmentViewSet, basename='apartments')
 router.register(r'users', UserViewSet, basename='users')
 router.register(r'bookings', BookingViewSet)
-router.register(r'combined', CombinedViewSet, basename='combined')
 
 
 urlpatterns = [
