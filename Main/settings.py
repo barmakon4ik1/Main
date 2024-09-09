@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.apartment.apps.ApartmentConfig',
     'apps.users.apps.UsersConfig',
+    'apps.booking.apps.BookingConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',

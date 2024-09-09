@@ -1,26 +1,32 @@
+from datetime import datetime
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .serializers import *
+from apps.booking.serializers import *
 from .models import *
-from apps.users.models import *
+from apps.booking.models import *
 from apps.users.permissions import *
 from django_filters.rest_framework import DjangoFilterBackend
-from .filters import *
+from .filters import HousingFilter
 from django.db.models import Q
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
 
 
 class ApartmentViewSet(viewsets.ModelViewSet):
     """
-    API эндпоинт, который разрешает пользователям просмотр или редактирование.
+    API эндпоинт, который разрешает пользователям просмотр объектов жилья.
     """
+    queryset = Housing.objects.all()
     serializer_class = HousingSerializer
     permission_classes = (IsAuthenticated, IsOwnerOrVisibleOrAdmin)
     filter_backends = [DjangoFilterBackend]
     filterset_class = HousingFilter
 
-    # Добавление документации по сортировке и подсказкам в полях фильтрации в Swagger:
+    # Добавление документации для Swagger с указанием доступных параметров сортировки и фильтрации
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
@@ -69,19 +75,39 @@ class ApartmentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        # Получаем параметры сортировки из запроса
-        # По умолчанию сортировка по id desc
+        # Получаем параметр сортировки из запроса, по умолчанию сортируем по id по убыванию
         sort_by = self.request.query_params.get('sort_by', '-id')
 
-        # Если пользователь администратор, возвращаем все объекты
+        # Получаем параметры дат из запроса
+        date_from = self.request.query_params.get('date_from')
+        date_to = self.request.query_params.get('date_to')
+
+        # Преобразуем даты из строкового формата в объекты datetime
+        if date_from:
+            date_from = datetime.strptime(date_from, '%Y-%m-%d')
+        if date_to:
+            date_to = datetime.strptime(date_to, '%Y-%m-%d')
+
         if user.is_staff:
             queryset = Housing.objects.all()
         else:
-            # В противном случае возвращаем только видимые объекты или те,
-            # которые созданы текущим пользователем
-            queryset = Housing.objects.filter(Q(is_visible=True) | Q(owner=user))
+            # Список объектов, отфильтрованный по видимости и принадлежности
+            queryset = Housing.objects.filter(
+                Q(is_visible=True) |
+                Q(owner=user) |
+                Q(booking__booking_user=user)
+            ).order_by('-id')
 
-        # Добавляем сортировку
+        # Фильтрация по дате бронирования
+        if date_from and date_to:
+            # Ищем объекты, у которых нет активного бронирования на указанные даты
+            queryset = queryset.exclude(
+                booking__booking_date_from__lte=date_to,
+                booking__booking_date_to__gte=date_from,
+                booking__booking_status="CONFIRMED"
+            )
+
+        # Реализация сортировки
         if sort_by == 'price_asc':
             queryset = queryset.order_by('price')
         elif sort_by == 'price_desc':
@@ -91,13 +117,34 @@ class ApartmentViewSet(viewsets.ModelViewSet):
         elif sort_by == 'date_desc':
             queryset = queryset.order_by('-created_at')
         else:
-            queryset = queryset.order_by('-id')  # По умолчанию сортировка по id
+            queryset = queryset.order_by('-id')  # Сортировка по id по умолчанию
 
         return queryset
 
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def book(self, request, pk=None):
+        """
+        Создание бронирования для объекта жилья
+        """
+        housing = self.get_object()
+
+        # Проверка на существование активного бронирования на указанные даты
+        serializer = BookingSerializer(data=request.data)
+        if serializer.is_valid():
+            booking = serializer.save(booking_user=request.user, booking_object=housing, booking_status='PENDING')
+            return Response({'status': 'Бронирование создано', 'booking': BookingSerializer(booking).data},
+                            status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ApartmentManagementViewSet(viewsets.ModelViewSet):
+    """
+    API эндпоинт для добавления, редактирования и удаления объектов жилья.
+    """
+    queryset = Housing.objects.all()
+    serializer_class = HousingSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+
     def perform_create(self, serializer):
-        # Устанавливаем владельца объекта на текущего пользователя при создании
         serializer.save(owner=self.request.user)
-
-
-

@@ -23,14 +23,29 @@ class IsOwnerOrVisibleOrAdmin(BasePermission):
         return obj.owner == request.user
 
 
-class RedirectToLoginPermission(BasePermission):
+class IsOwnerOrAdmin(BasePermission):
     """
-    Кастомный permission класс, перенаправляющий
-    не аутентифицированных пользователей на страницу логина.
+    Разрешение, позволяющее доступ только владельцам объекта или администраторам.
     """
-    def has_permission(self, request, view):
-        if request.user.is_authenticated:
+
+    def has_object_permission(self, request, view, obj):
+        # Разрешаем доступ, если пользователь - администратор
+        if request.user.is_staff:
             return True
-        else:
-            # Перенаправление на страницу логина
-            return False
+
+        # Разрешаем доступ, если пользователь - владелец объекта
+        return obj.owner == request.user
+
+
+
+# class RedirectToLoginPermission(BasePermission):
+#     """
+#     Кастомный permission класс, перенаправляющий
+#     не аутентифицированных пользователей на страницу логина.
+#     """
+#     def has_permission(self, request, view):
+#         if request.user.is_authenticated:
+#             return True
+#         else:
+#             # Перенаправление на страницу логина
+#             return False

@@ -1,0 +1,52 @@
+from rest_framework import serializers
+from .models import Booking
+from apps.apartment.models import *
+from apps.users.serializers import *
+from apps.apartment.serializers import *
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    # Используем UserSerializer для отображения first_name и last_name
+    booking_user = UserListSerializer(read_only=True)
+    # Вложенный сериализатор для объекта жилья
+    booking_object = HousingSerializer(read_only=True)
+
+    class Meta:
+        model = Booking
+        fields = ['id', 'booking_user', 'booking_date_from', 'booking_date_to',
+                  'booking_object', 'created_at', 'booking_status']
+        read_only_fields = ['booking_user', 'created_at']
+        extra_kwargs = {
+            'booking_status': {'default': 'PENDING'}
+        }
+
+    def validate(self, data):
+        # Проверка на пересечение бронирований
+        if data['booking_date_from'] > data['booking_date_to']:
+            raise serializers.ValidationError("Дата начала бронирования не может быть позже даты окончания.")
+
+        overlapping_bookings = Booking.objects.filter(
+            booking_object=data['booking_object'],
+            booking_status='CONFIRMED'
+        ).exclude(
+            booking_date_from__gt=data['booking_date_to']
+        ).exclude(
+            booking_date_to__lt=data['booking_date_from']
+        )
+
+        if overlapping_bookings.exists():
+            raise serializers.ValidationError("Объект уже забронирован на выбранные даты.")
+
+        return data
+
+    def confirm_booking(self):
+        booking = self.instance
+        booking.booking_status = 'CONFIRMED'
+        booking.save()
+
+        # Скрываем объект ото всех, кроме владельца и пользователя, который забронировал объект
+        housing = booking.booking_object
+        housing.is_visible = False
+        housing.save()
+
+        return booking
