@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-class ApartmentViewSet(viewsets.ModelViewSet):
+class ApartmentViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API эндпоинт, который разрешает пользователям просмотр объектов жилья.
     """
@@ -121,6 +121,15 @@ class ApartmentViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    @swagger_auto_schema(
+        method='POST',
+        request_body=BookingSerializer,
+        responses={
+            201: BookingSerializer,
+            400: 'Некорректные данные'
+        },
+        operation_description="Создание бронирования для объекта жилья"
+    )
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def book(self, request, pk=None):
         """

@@ -1,5 +1,4 @@
-from rest_framework import serializers
-from .models import Booking
+from apps.booking.models import *
 from apps.apartment.models import *
 from apps.users.serializers import *
 from apps.apartment.serializers import *
