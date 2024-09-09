@@ -1,21 +1,26 @@
 from datetime import datetime
-
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from .serializers import HousingSerializer
-from .models import Housing
-from apps.users.permissions import IsOwnerOrVisibleOrAdmin
+from .serializers import *
+from apps.booking.serializers import *
+from .models import *
+from apps.booking.models import *
+from apps.users.permissions import *
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import HousingFilter
 from django.db.models import Q
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
 
 
 class ApartmentViewSet(viewsets.ModelViewSet):
     """
-    API эндпоинт, который разрешает пользователям просмотр или редактирование объектов жилья.
+    API эндпоинт, который разрешает пользователям просмотр объектов жилья.
     """
+    queryset = Housing.objects.all()
     serializer_class = HousingSerializer
     permission_classes = (IsAuthenticated, IsOwnerOrVisibleOrAdmin)
     filter_backends = [DjangoFilterBackend]
@@ -83,12 +88,10 @@ class ApartmentViewSet(viewsets.ModelViewSet):
         if date_to:
             date_to = datetime.strptime(date_to, '%Y-%m-%d')
 
-        # Начальное получение объектов
         if user.is_staff:
-            # Администратор видит все объекты
             queryset = Housing.objects.all()
         else:
-            # Пользователь видит только свои объекты, видимые объекты или те, которые он забронировал
+            # Список объектов, отфильтрованный по видимости и принадлежности
             queryset = Housing.objects.filter(
                 Q(is_visible=True) |
                 Q(owner=user) |
@@ -118,6 +121,30 @@ class ApartmentViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def book(self, request, pk=None):
+        """
+        Создание бронирования для объекта жилья
+        """
+        housing = self.get_object()
+
+        # Проверка на существование активного бронирования на указанные даты
+        serializer = BookingSerializer(data=request.data)
+        if serializer.is_valid():
+            booking = serializer.save(booking_user=request.user, booking_object=housing, booking_status='PENDING')
+            return Response({'status': 'Бронирование создано', 'booking': BookingSerializer(booking).data},
+                            status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ApartmentManagementViewSet(viewsets.ModelViewSet):
+    """
+    API эндпоинт для добавления, редактирования и удаления объектов жилья.
+    """
+    queryset = Housing.objects.all()
+    serializer_class = HousingSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+
     def perform_create(self, serializer):
-        # Устанавливаем владельца объекта на текущего пользователя при создании
         serializer.save(owner=self.request.user)
