@@ -22,7 +22,6 @@ address - ссылка на класс адреса объекта
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from apps.users.models import User
-from apps.booking.models import Booking
 
 
 class Address(models.Model):
@@ -51,7 +50,8 @@ class Housing(models.Model):
         ('APARTMENT', 'Apartment'),
         ('HOUSE', 'House'),
         ('STUDIO', 'Studio'),
-        ('CASTLE', 'Castle')
+        ('CASTLE', 'Castle'),
+        ('HOTEL', 'Hotel'),
         # другие типы жилья
     )
     objects_name = models.CharField(
@@ -85,12 +85,12 @@ class Housing(models.Model):
 
     is_visible = models.BooleanField(default=True,) # видимость объекта для просмотра
     created_at = models.DateTimeField(auto_now_add=True) # дата создания записи
-    is_booked = models.OneToOneField(
-        Booking,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='is_booked'
-    ) # статус резервирования объекта
+    # is_booked = models.OneToOneField(
+    #     Booking,
+    #     on_delete=models.SET_NULL,
+    #     null=True,
+    #     related_name='is_booked'
+    # ) # статус резервирования объекта
 
     def __str__(self):
         return self.objects_name

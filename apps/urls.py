@@ -23,10 +23,10 @@ schema_view = get_schema_view(
 )
 
 router = DefaultRouter()
-router.register(r'apartments', ApartmentViewSet, basename='apartments')
-router.register(r'apartment-management', ApartmentManagementViewSet, basename='apartment-management')
-router.register(r'users', UserViewSet, basename='users')
 router.register(r'bookings', BookingViewSet, basename='bookings')
+router.register(r'bookings-management', BookingManagementViewSet, basename='bookings-management')
+router.register(r'apartment', ApartmentManagementViewSet, basename='apartment')
+router.register(r'users', UserViewSet, basename='users')
 
 
 urlpatterns = [
