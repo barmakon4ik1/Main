@@ -8,7 +8,7 @@ class BookingSerializer(serializers.ModelSerializer):
     # Используем UserSerializer для отображения first_name и last_name
     booking_user = UserListSerializer(read_only=True)
     # # Вложенный сериализатор для объекта жилья
-    # booking_object = HousingSerializer(read_only=True)
+    booking_object = HousingSerializer(read_only=True)
 
     class Meta:
         model = Booking
@@ -27,6 +27,12 @@ class BookingSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
+        booking_object = self.initial_data.get('booking_object')
+
+        # 'booking_object' есть в data?
+        if 'booking_object' not in data:
+            raise serializers.ValidationError("Объект бронирования не указан.")
+
         # Проверка на пересечение бронирований
         if data['booking_date_from'] > data['booking_date_to']:
             raise serializers.ValidationError("Дата начала бронирования не может быть позже даты окончания.")

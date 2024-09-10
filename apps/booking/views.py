@@ -155,23 +155,26 @@ class BookingViewSet(viewsets.ReadOnlyModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
-    def confirm(self, request, pk=None):
-        booking = self.get_object()
-
-        if request.user == booking.booking_object.owner or request.user.is_staff:
-            booking.booking_status = 'CONFIRMED'
-            booking.booking_object.is_visible = False
-            booking.booking_object.save()
-            booking.save()
-            return Response({'status': 'Бронирование подтверждено и объект скрыт'},
-                            status=status.HTTP_200_OK)
-
-        return Response({'error': 'Вы не имеете права подтверждать это бронирование'},
-                        status=status.HTTP_403_FORBIDDEN)
+    # @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    # def confirm(self, request, pk=None):
+    #     booking = self.get_object()
+    #
+    #     if request.user == booking.booking_object.owner or request.user.is_staff:
+    #         booking.booking_status = 'CONFIRMED'
+    #         booking.booking_object.is_visible = False
+    #         booking.booking_object.save()
+    #         booking.save()
+    #         return Response({'status': 'Бронирование подтверждено и объект скрыт'},
+    #                         status=status.HTTP_200_OK)
+    #
+    #     return Response({'error': 'Вы не имеете права подтверждать это бронирование'},
+    #                     status=status.HTTP_403_FORBIDDEN)
 
 
 class BookingManagementViewSet(viewsets.ModelViewSet):
+    """
+    Эндпоинт операций с бронированием
+    """
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]

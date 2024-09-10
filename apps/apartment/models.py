@@ -85,15 +85,12 @@ class Housing(models.Model):
 
     is_visible = models.BooleanField(default=True,) # видимость объекта для просмотра
     created_at = models.DateTimeField(auto_now_add=True) # дата создания записи
-    # is_booked = models.OneToOneField(
-    #     Booking,
-    #     on_delete=models.SET_NULL,
-    #     null=True,
-    #     related_name='is_booked'
-    # ) # статус резервирования объекта
 
     def __str__(self):
-        return self.objects_name
+        owner_first_name = self.owner.first_name or ''
+        owner_last_name = self.owner.last_name or ''
+        owner_name = f"{owner_first_name} {owner_last_name}".strip() or 'Owner Info Missing'
+        return f'{self.objects_name} (Owner: {owner_name})'
 
     class Meta:
         verbose_name_plural = _('Housings')
