@@ -9,9 +9,13 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated, I
 from .permissions import *
 from .serializers import *
 from rest_framework.views import APIView
+from django.utils.translation import gettext_lazy as _
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """
+    Конечная точка API, позволяющая просматривать и редактировать пользователей.
+    """
     queryset = User.objects.all()
     serializer_class = UserListSerializer
     permission_classes = (IsAdminUser,)
@@ -19,6 +23,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
 # Simple JWT
 class LoginView(APIView):
+    """
+    Вход в систему
+    """
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
@@ -66,6 +73,9 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
+    """
+     Выход мз системы
+    """
     def post(self, request, *args, **kwargs):
         response = Response(status=status.HTTP_204_NO_CONTENT)
         response.delete_cookie('access_token')
@@ -74,16 +84,22 @@ class LogoutView(APIView):
 
 
 class ProtectedDataView(APIView):
+    """
+    Защищенный просмотр
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        return Response({"Сообщение": "Добро пожаловать!",
-                         "Имя пользователя": request.user.username,
-                        "Ваш статус": request.user.position,})
+        return Response({"message": "Welcome!",
+                         "username": request.user.username,
+                        "status": request.user.position,})
 
 
 def set_jwt_cookies(response, user):
+    """
+    Сохранение токенов для передачи в запросы
+    """
     # Создаем новый RefreshToken для пользователя
     refresh = RefreshToken.for_user(user)
 
@@ -118,6 +134,9 @@ def set_jwt_cookies(response, user):
 
 
 class RegisterView(APIView):
+    """
+    Регистрация пользователя
+    """
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -135,36 +154,45 @@ class RegisterView(APIView):
 
 
 class PublicView(APIView):
+    """
+    Публичный доступ любому
+    """
     permission_classes = [AllowAny]
 
     def get(self, request):
-        return Response({"сообщение": "Доступ любому!"})
+        return Response({"message": "Access to anyone"})
 
 
 class PrivateView(APIView):
+    """
+    Частный доступ
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        return Response({"сообщение": f"Hello, {request.user.username}!"})
+        return Response({"message": "Hello" + request.user.username + "!"})
 
 
 class AdminView(APIView):
+    """
+    Класс администратора
+    """
     permission_classes = [IsAdminUser]
 
     def get(self, request):
-        return Response({"сообщение": "Hello, Admin!"})
+        return Response({"message": "Hello, Admin!"})
 
 
 class ReadOnlyOrAuthenticatedView(APIView):
+    """
+    Редактирование данных возможно только после аутентификации
+    """
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request):
-        return Response({"сообщение": "Изменять могут только аутентифицированные пользователи."})
+        return Response({"message": "Only authenticated users can make changes!"})
 
     def post(self, request):
-        return Response({"сообщение": "Данные созданы аутентифицированным пользователем!"})
+        return Response({"message": "Data created by an authenticated user!"})
 
 
-from django.shortcuts import render
-
-# Create your views here.
