@@ -29,7 +29,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS':
         'rest_framework.pagination.PageNumberPagination',
         # Размер страницы по умолчанию:
-        'PAGE_SIZE': 1,
+        'PAGE_SIZE': 3,
 
     # Simple JWT - тип аутентификации
     'DEFAULT_AUTHENTICATION_CLASSES': [

@@ -14,10 +14,24 @@ class Booking(models.Model):
         ("CANCELED", "Canceled"),
         ("UNCONFIRMED", "Unconfirmed")
     )
-    booking_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
+    booking_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='bookings'
+    )
     booking_date_from = models.DateField(_('Booking from'), null=True, blank=True)
     booking_date_to = models.DateField(_('Booking to'), null=True, blank=True)
-    booking_object = models.ForeignKey(Housing, on_delete=models.CASCADE, related_name='bookings')
+    booking_object = models.ForeignKey(
+        Housing,
+        on_delete=models.CASCADE,
+        related_name='bookings'
+    )
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='owned_bookings',
+        editable=False  # Запрещаем редактирование поля напрямую
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     booking_status = models.CharField(
         _('Status'),
@@ -35,11 +49,15 @@ class Booking(models.Model):
         verbose_name = _('Booking')
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # Сначала сохраняем объект жилья
-        # Присваиваем владельцу роль 'OWNER'
+        # Устанавливаем владельца на основе объекта жилья перед сохранением
+        if not self.owner_id:  # Проверяем, если поле owner еще не заполнено
+            self.owner = self.booking_object.owner
+        super().save(*args, **kwargs)  # Сохраняем бронирование
+
+        # Присваиваем владельцу роль 'OWNER' в профиле пользователя
         if hasattr(self.owner, 'profile'):
             self.owner.profile.position = 'OWNER'
             self.owner.profile.save()
         else:
-            # Если у пользователя нет профиля, создаем профиль или обрабатываем по-другому
+            # Если у пользователя нет профиля, можно создать профиль или обработать по-другому
             pass

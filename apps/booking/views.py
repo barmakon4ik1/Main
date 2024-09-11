@@ -14,6 +14,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from ..apartment.filters import HousingFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 
 class BookingViewSet(viewsets.ReadOnlyModelViewSet):
@@ -21,10 +22,25 @@ class BookingViewSet(viewsets.ReadOnlyModelViewSet):
      API эндпоинт, который разрешает пользователям просмотр объектов жилья и управление бронированиями.
     """
     queryset = Housing.objects.all()
-    serializer_class = HousingSerializer
     permission_classes = (IsAuthenticated, IsOwnerOrVisibleOrAdmin)
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = HousingFilter
+    ordering_fields = '__all__'  # Позволяет сортировать по всем полям модели
+    ordering = ['-created_at']  # Сортировка по умолчанию
+    search_fields = [
+        'booking_user__first_name',
+        'booking_user__last_name',
+        'booking_object__objects_name',
+        'booking_object__address__city'
+    ]  # Поля для поиска
+
+    def get_serializer_class(self):
+        # Определяем сериализатор в зависимости от действия
+        if self.action == 'list' or self.action == 'retrieve':
+            return HousingSerializer  # Для просмотра объектов жилья
+        elif self.action == 'book':
+            return BookingSerializer  # Для управления бронированием
+        return HousingSerializer  # По умолчанию возвращаем HousingSerializer
 
     # Добавление документации для Swagger с указанием доступных параметров сортировки и фильтрации
     @swagger_auto_schema(
@@ -155,20 +171,20 @@ class BookingViewSet(viewsets.ReadOnlyModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
-    # def confirm(self, request, pk=None):
-    #     booking = self.get_object()
-    #
-    #     if request.user == booking.booking_object.owner or request.user.is_staff:
-    #         booking.booking_status = 'CONFIRMED'
-    #         booking.booking_object.is_visible = False
-    #         booking.booking_object.save()
-    #         booking.save()
-    #         return Response({'status': 'Бронирование подтверждено и объект скрыт'},
-    #                         status=status.HTTP_200_OK)
-    #
-    #     return Response({'error': 'Вы не имеете права подтверждать это бронирование'},
-    #                     status=status.HTTP_403_FORBIDDEN)
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def confirm(self, request, pk=None):
+        booking = self.get_object()
+
+        if request.user == booking.booking_object.owner or request.user.is_staff:
+            booking.booking_status = 'CONFIRMED'
+            booking.booking_object.is_visible = False
+            booking.booking_object.save()
+            booking.save()
+            return Response({'status': 'Бронирование подтверждено и объект скрыт'},
+                            status=status.HTTP_200_OK)
+
+        return Response({'error': 'Вы не имеете права подтверждать это бронирование'},
+                        status=status.HTTP_403_FORBIDDEN)
 
 
 class BookingManagementViewSet(viewsets.ModelViewSet):

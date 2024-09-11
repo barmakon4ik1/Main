@@ -3,6 +3,7 @@
 """
 from apps.apartment.models import *
 from rest_framework import serializers
+from apps.users.serializers import *
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -20,6 +21,7 @@ class HousingSerializer(serializers.ModelSerializer):
     Сериализатор жилых объектов
     """
     address = AddressSerializer()
+    owner = UserListSerializer()
 
     class Meta:
         model = Housing

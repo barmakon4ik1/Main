@@ -6,21 +6,13 @@ from apps.apartment.serializers import *
 
 class BookingSerializer(serializers.ModelSerializer):
     # Используем UserSerializer для отображения first_name и last_name
-    booking_user = UserListSerializer(read_only=True)
+    booking_user = UserListSerializer()
     # # Вложенный сериализатор для объекта жилья
-    booking_object = HousingSerializer(read_only=True)
+    booking_object = HousingSerializer()
 
     class Meta:
         model = Booking
-        fields = [
-            'id',
-            'booking_user',
-            'booking_date_from',
-            'booking_date_to',
-            'booking_object',
-            'created_at',
-            'booking_status'
-        ]
+        fields = '__all__'
         read_only_fields = ['booking_user', 'created_at']
         extra_kwargs = {
             'booking_status': {'default': 'PENDING'}
