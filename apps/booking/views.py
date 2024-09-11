@@ -111,16 +111,16 @@ class BookingViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = Housing.objects.filter(
                 Q(is_visible=True) |
                 Q(owner=user) |
-                Q(booking__booking_user=user)
+                Q(bookings__booking_user=user)  # Заменено на 'bookings'
             ).order_by('-id')
 
         # Фильтрация по дате бронирования
         if date_from and date_to:
             # Ищем объекты, у которых нет активного бронирования на указанные даты
             queryset = queryset.exclude(
-                booking__booking_date_from__lte=date_to,
-                booking__booking_date_to__gte=date_from,
-                booking__booking_status="CONFIRMED"
+                bookings__booking_date_from__lte=date_to,
+                bookings__booking_date_to__gte=date_from,
+                bookings__booking_status="CONFIRMED"
             )
 
         # Реализация сортировки

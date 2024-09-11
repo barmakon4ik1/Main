@@ -6,9 +6,9 @@ from apps.apartment.serializers import *
 
 class BookingSerializer(serializers.ModelSerializer):
     # Используем UserSerializer для отображения first_name и last_name
-    booking_user = UserListSerializer()
+    booking_user = UserListSerializer(read_only=True)
     # # Вложенный сериализатор для объекта жилья
-    booking_object = HousingSerializer()
+    booking_object = HousingSerializer(read_only=True)
 
     class Meta:
         model = Booking
