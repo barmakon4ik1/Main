@@ -4,6 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from apps.apartment.views import *
 from apps.users.views import *
 from apps.booking.views import *
+from apps.reviews.views import *
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
@@ -24,6 +25,7 @@ schema_view = get_schema_view(
 
 router = DefaultRouter()
 router.register(r'bookings', BookingViewSet, basename='bookings')
+router.register(r'reviews', ReviewViewSet)
 router.register(r'bookings-management', BookingManagementViewSet, basename='bookings-management')
 router.register(r'apartment', ApartmentManagementViewSet, basename='apartment')
 router.register(r'users', UserViewSet, basename='users')

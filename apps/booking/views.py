@@ -6,6 +6,7 @@ from apps.booking.serializers import *
 from .models import *
 from apps.booking.models import *
 from apps.users.permissions import *
+from apps.reviews.models import *
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 from drf_yasg.utils import swagger_auto_schema
@@ -218,3 +219,29 @@ class BookingManagementViewSet(viewsets.ModelViewSet):
 
         return Response({'error': 'Вы не имеете права подтверждать это бронирование'},
                         status=status.HTTP_403_FORBIDDEN)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def leave_review(self, request, pk=None):
+        """
+        Действие для создания отзыва и рейтинга для объекта жилья по завершенному бронированию
+        """
+        booking = self.get_object()
+
+        # Проверка, является ли бронирование подтвержденным и завершенным
+        if booking.booking_status != 'CONFIRMED':
+            return Response({'error': 'Вы можете оставить отзыв только для подтвержденного бронирования'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Проверка, что отзыв оставляется для забронированного объекта жилья
+        if booking.booking_user != request.user:
+            return Response({'error': 'Вы можете оставить отзыв только для своего бронирования'},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        # Десериализация данных отзыва
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            # Сохранение отзыва с привязкой к пользователю и объекту жилья
+            serializer.save(user=request.user, housing=booking.booking_object)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -2,13 +2,16 @@ from apps.booking.models import *
 from apps.apartment.models import *
 from apps.users.serializers import *
 from apps.apartment.serializers import *
+from apps.reviews.serializers import *
 
 
 class BookingSerializer(serializers.ModelSerializer):
     # Используем UserSerializer для отображения first_name и last_name
     booking_user = UserListSerializer(read_only=True)
-    # # Вложенный сериализатор для объекта жилья
+    # Вложенный сериализатор для объекта жилья
     booking_object = HousingSerializer(read_only=True)
+    # Вложенный сериализатор для отзывов
+    booking_review = ReviewSerializer(read_only=True)
 
     class Meta:
         model = Booking

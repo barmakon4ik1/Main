@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'apps.apartment.apps.ApartmentConfig',
     'apps.users.apps.UsersConfig',
     'apps.booking.apps.BookingConfig',
+    'apps.reviews.apps.ReviewsConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
