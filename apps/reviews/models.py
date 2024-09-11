@@ -24,9 +24,8 @@ class Review(models.Model):
     ) # Связь с объектом жилья
     rating = models.IntegerField(
         _('Rating'),
-        choices=RATING_CHOICES,
-        default=0
-    ) # Рейтинг, изначально его отсутствие = 0
+        choices=RATING_CHOICES
+    ) # Рейтинг
     comment = models.TextField(
         _('Comment'),
         blank=True,
