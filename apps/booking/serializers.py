@@ -16,10 +16,10 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = '__all__'
-        read_only_fields = ['booking_user', 'created_at']
-        extra_kwargs = {
-            'booking_status': {'default': 'PENDING'}
-        }
+        # read_only_fields = ['booking_user', 'created_at']
+        # extra_kwargs = {
+        #     'booking_status': {'default': 'PENDING'}
+        # }
 
     def validate(self, data):
         booking_object = self.initial_data.get('booking_object')
@@ -51,9 +51,9 @@ class BookingSerializer(serializers.ModelSerializer):
         booking.booking_status = 'CONFIRMED'
         booking.save()
 
-        # Скрываем объект ото всех, кроме владельца и пользователя, который забронировал объект
-        housing = booking.booking_object
-        housing.is_visible = False
-        housing.save()
+        # # Скрываем объект ото всех, кроме владельца и пользователя, который забронировал объект
+        # housing = booking.booking_object
+        # housing.is_visible = False
+        # housing.save()
 
         return booking

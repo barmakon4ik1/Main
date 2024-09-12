@@ -16,7 +16,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     Конечная точка API, позволяющая просматривать и редактировать пользователей.
     """
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserListSerializer
     permission_classes = (IsAdminUser,)
 

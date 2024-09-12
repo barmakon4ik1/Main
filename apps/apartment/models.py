@@ -30,8 +30,8 @@ class Address(models.Model):
     """
     country = models.CharField(_('Country'), max_length=100)
     city = models.CharField(_('City'), max_length=100)
-    street = models.CharField(_('Street'), max_length=100)
-    house_number = models.CharField(_('Haus number'), max_length=6)
+    street = models.CharField(_('Street'), max_length=100, null=True, blank=True)
+    house_number = models.CharField(_('Haus number'), max_length=6, null=True, blank=True)
     postal_code = models.CharField(_('Index'), max_length=100)
 
     def __str__(self):
