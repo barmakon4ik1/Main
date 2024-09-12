@@ -31,7 +31,7 @@ class HousingTests(APITestCase):
             address=self.address,
             owner=self.user
         )
-        self.url = reverse('apartment-list', args=[self.housing.pk])
+        self.url = reverse('apartment-detail', args=[self.housing.pk])
 
     def test_patch_housing(self):
         self.client.login(username='owner@example.com', password='password123')  # Аутентификация пользователя
@@ -46,3 +46,6 @@ class HousingTests(APITestCase):
         # Проверка обновления данных
         self.housing.refresh_from_db()
         self.assertEqual(self.housing.price, 150.00)
+
+# Строка вызова теста из терминала:
+# python.exe .\manage.py test apps.apartment.tests
