@@ -43,51 +43,51 @@ class BookingViewSet(viewsets.ReadOnlyModelViewSet):
             return BookingSerializer  # Для управления бронированием
         return HousingSerializer  # По умолчанию возвращаем HousingSerializer
 
-    # Добавление документации для Swagger с указанием доступных параметров сортировки и фильтрации
-    @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(
-                name='sort_by',
-                in_=openapi.IN_QUERY,
-                description='Сортировка по цене или дате: price_asc, price_desc, date_asc, date_desc',
-                type=openapi.TYPE_STRING,
-                enum=['price_asc', 'price_desc', 'date_asc', 'date_desc']
-            ),
-            openapi.Parameter(
-                name='price_min',
-                in_=openapi.IN_QUERY,
-                description='Введите минимальное значение цены',
-                type=openapi.TYPE_INTEGER
-            ),
-            openapi.Parameter(
-                name='price_max',
-                in_=openapi.IN_QUERY,
-                description='Введите максимальное значение цены',
-                type=openapi.TYPE_INTEGER
-            ),
-            openapi.Parameter(
-                name='rooms',
-                in_=openapi.IN_QUERY,
-                description='Введите число комнат',
-                type=openapi.TYPE_INTEGER
-            ),
-            openapi.Parameter(
-                name='type',
-                in_=openapi.IN_QUERY,
-                description='Выберите тип объекта',
-                type=openapi.TYPE_STRING,
-                enum=[choice[0] for choice in Housing.TYPE_CHOICES]
-            ),
-            openapi.Parameter(
-                name='keyword',
-                in_=openapi.IN_QUERY,
-                description='Введите ключевые слова для поиска',
-                type=openapi.TYPE_STRING
-            )
-        ]
-    )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+    # # Добавление документации для Swagger с указанием доступных параметров сортировки и фильтрации
+    # @swagger_auto_schema(
+    #     manual_parameters=[
+    #         openapi.Parameter(
+    #             name='sort_by',
+    #             in_=openapi.IN_QUERY,
+    #             description='Сортировка по цене или дате: price_asc, price_desc, date_asc, date_desc',
+    #             type=openapi.TYPE_STRING,
+    #             enum=['price_asc', 'price_desc', 'date_asc', 'date_desc']
+    #         ),
+    #         openapi.Parameter(
+    #             name='price_min',
+    #             in_=openapi.IN_QUERY,
+    #             description='Введите минимальное значение цены',
+    #             type=openapi.TYPE_INTEGER
+    #         ),
+    #         openapi.Parameter(
+    #             name='price_max',
+    #             in_=openapi.IN_QUERY,
+    #             description='Введите максимальное значение цены',
+    #             type=openapi.TYPE_INTEGER
+    #         ),
+    #         openapi.Parameter(
+    #             name='rooms',
+    #             in_=openapi.IN_QUERY,
+    #             description='Введите число комнат',
+    #             type=openapi.TYPE_INTEGER
+    #         ),
+    #         openapi.Parameter(
+    #             name='type',
+    #             in_=openapi.IN_QUERY,
+    #             description='Выберите тип объекта',
+    #             type=openapi.TYPE_STRING,
+    #             enum=[choice[0] for choice in Housing.TYPE_CHOICES]
+    #         ),
+    #         openapi.Parameter(
+    #             name='keyword',
+    #             in_=openapi.IN_QUERY,
+    #             description='Введите ключевые слова для поиска',
+    #             type=openapi.TYPE_STRING
+    #         )
+    #     ]
+    # )
+    # def list(self, request, *args, **kwargs):
+    #     return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user
@@ -124,29 +124,29 @@ class BookingViewSet(viewsets.ReadOnlyModelViewSet):
                 bookings__booking_status="CONFIRMED"
             )
 
-        # Реализация сортировки
-        if sort_by == 'price_asc':
-            queryset = queryset.order_by('price')
-        elif sort_by == 'price_desc':
-            queryset = queryset.order_by('-price')
-        elif sort_by == 'date_asc':
-            queryset = queryset.order_by('created_at')
-        elif sort_by == 'date_desc':
-            queryset = queryset.order_by('-created_at')
-        else:
-            queryset = queryset.order_by('-id')  # Сортировка по id по умолчанию
+        # # Реализация сортировки
+        # if sort_by == 'price_asc':
+        #     queryset = queryset.order_by('price')
+        # elif sort_by == 'price_desc':
+        #     queryset = queryset.order_by('-price')
+        # elif sort_by == 'date_asc':
+        #     queryset = queryset.order_by('created_at')
+        # elif sort_by == 'date_desc':
+        #     queryset = queryset.order_by('-created_at')
+        # else:
+        #     queryset = queryset.order_by('-id')  # Сортировка по id по умолчанию
 
         return queryset
 
-    @swagger_auto_schema(
-        method='POST',
-        request_body=BookingSerializer,
-        responses={
-            201: BookingSerializer,
-            400: 'Некорректные данные'
-        },
-        operation_description="Создание бронирования для объекта жилья"
-    )
+    # @swagger_auto_schema(
+    #     method='POST',
+    #     request_body=BookingSerializer,
+    #     responses={
+    #         201: BookingSerializer,
+    #         400: 'Некорректные данные'
+    #     },
+    #     operation_description="Создание бронирования для объекта жилья"
+    # )
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def book(self, request, pk=None):
         """

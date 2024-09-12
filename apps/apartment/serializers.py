@@ -21,7 +21,7 @@ class HousingSerializer(serializers.ModelSerializer):
     Сериализатор жилых объектов
     """
     address = AddressSerializer()
-    owner = UserListSerializer()
+    owner = UserListSerializer(read_only=True)
 
     class Meta:
         model = Housing
