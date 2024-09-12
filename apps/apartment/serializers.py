@@ -25,7 +25,7 @@ class HousingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Housing
-        fields = ['address', 'objects_name', 'type', 'rooms', 'description', 'price', 'owner', 'is_visible']
+        fields = '__all__'
         read_only_fields = ['owner']  # Автоматическое добавление владельца объекта
 
     def create(self, validated_data):
