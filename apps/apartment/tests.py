@@ -47,5 +47,43 @@ class HousingTests(APITestCase):
         self.housing.refresh_from_db()
         self.assertEqual(self.housing.price, 150.00)
 
+
+class ApartmentManagementTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='owner',
+            email='owner@example.com',
+            first_name='New',
+            last_name='User',
+            password='password123'
+        )
+        self.address = Address.objects.create(
+            country='Country',
+            city='City',
+            street='Street',
+            house_number='1',
+            postal_code='12345'
+        )
+        self.housing = Housing.objects.create(
+            objects_name='Test Apartment',
+            type='APARTMENT',
+            rooms=2,
+            description='Description',
+            price=100.00,
+            address=self.address,
+            owner=self.user
+        )
+        self.url = reverse('apartment-detail', args=[self.housing.pk])
+
+    def test_patch_housing(self):
+        self.client.login(username='owner@example.com', password='password123')
+
+        data = {'price': 150.00}
+        response = self.client.patch(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.housing.refresh_from_db()
+        self.assertEqual(self.housing.price, 150.00)
+
 # Строка вызова теста из терминала:
 # python.exe .\manage.py test apps.apartment.tests
