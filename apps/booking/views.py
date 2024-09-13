@@ -20,7 +20,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 
 class BookingViewSet(viewsets.ReadOnlyModelViewSet):
     """
-     API эндпоинт, который разрешает пользователям просмотр объектов жилья и управление бронированиями.
+     API эндпоинт, который разрешает пользователям просмотр объектов жилья и фильтрацию выбора
     """
     queryset = Housing.objects.all()
     permission_classes = (IsAuthenticated, IsOwnerOrVisibleOrAdmin)
@@ -112,7 +112,7 @@ class BookingViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = Housing.objects.filter(
                 Q(is_visible=True) |
                 Q(owner=user) |
-                Q(bookings__booking_user=user)  # Заменено на 'bookings'
+                Q(bookings__booking_user=user)
             ).order_by('-id')
 
         # Фильтрация по дате бронирования

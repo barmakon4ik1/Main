@@ -10,10 +10,9 @@ class AddressSerializer(serializers.ModelSerializer):
     """
     Сериализатор адреса
     """
-
     class Meta:
         model = Address
-        fields = ['id', 'country', 'postal_code', 'city', 'street', 'house_number']
+        fields = '__all__'
 
 
 class HousingSerializer(serializers.ModelSerializer):
@@ -27,6 +26,10 @@ class HousingSerializer(serializers.ModelSerializer):
         model = Housing
         fields = '__all__'
         read_only_fields = ['owner']  # Автоматическое добавление владельца объекта
+
+    def update(self, validated_data):
+        validated_data['owner'] = self.context['request'].user
+        return super().update(validated_data)
 
     def create(self, validated_data):
         # Извлекаем данные адреса из validated_data

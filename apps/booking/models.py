@@ -21,7 +21,7 @@ class Booking(models.Model):
     )
     booking_date_from = models.DateField(_('Booking from'), null=True, blank=True)
     booking_date_to = models.DateField(_('Booking to'), null=True, blank=True)
-    booking_object = models.ForeignKey(
+    booking_object = models.OneToOneField(
         Housing,
         on_delete=models.CASCADE,
         related_name='bookings'
